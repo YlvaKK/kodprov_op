@@ -79,9 +79,28 @@ public class IdNrValidatorTest {
 
     //equivalence class testing of control number validation
     @Test
-    public void test_validateDate_incorrectControlNumber() {
+    public void test_validateControl_incorrectControlNumber() {
         IdNrValidator v = new PNrValidator(TEST_DATE);
         assertFalse(v.isValid("19900118-9812"));
+    }
+
+    //testing that samordningsnummer are different from personnummer
+    @Test
+    public void test_isValidSamordning_withPNr() {
+        IdNrValidator vP = new PNrValidator(TEST_DATE);
+        IdNrValidator vS = new SamNrValidator(TEST_DATE);
+        String number = "19900118-9811";
+        assertTrue(vP.isValid(number));
+        assertFalse(vS.isValid(number));
+    }
+
+    @Test
+    public void test_isValidSamordning_withSamNr() {
+        IdNrValidator vP = new PNrValidator(TEST_DATE);
+        IdNrValidator vS = new SamNrValidator(TEST_DATE);
+        String number = "19900178-9818";
+        assertFalse(vP.isValid(number));
+        assertTrue(vS.isValid(number));
     }
 
     // test validation of all provided examples
