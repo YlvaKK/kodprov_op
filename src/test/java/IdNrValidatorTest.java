@@ -9,11 +9,86 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class IdNrValidatorTest {
+    
+    public static final LocalDate TEST_DATE = LocalDate.of(2022, 11, 20);
 
+    //equivalence class testing of format validation
+    @Test
+    public void test_validateFormat_wrongLengthSuffix() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("170110-23840"));
+        assertFalse(v.isValid("170110+238"));
+    }
+
+    @Test
+    public void test_validateFormat_nonDigitInSuffix() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("20170110238B"));
+    }
+
+    @Test
+    public void test_validateFormat_wrongLengthPrefix() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("020170110-2384"));
+        assertFalse(v.isValid("70110-2384"));
+        assertFalse(v.isValid("0170110-2384"));
+    }
+
+    @Test
+    public void test_validateFormat_nonDigitInPrefix() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("17011B-2384"));
+    }
+
+    @Test
+    public void test_validateFormat_invalidDivider() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("170110&2384"));
+    }
+
+    //equivalence class testing of date validation
+    @Test
+    public void test_validateDate_afterTestDate() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("202301301236"));
+    }
+
+    @Test
+    public void test_validateDate_notWithinCentury() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertTrue(v.isValid("900118+9811"));
+    }
+
+    @Test
+    public void test_validateDate_withinCentury() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertTrue(v.isValid("19900118-9811"));
+    }
+
+    @Test
+    public void test_validateDate_nonExistingDate() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("030229-2396"));
+    }
+
+    @Test
+    public void test_validateDate_mismatchYearDivider() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("19900118+9811"));
+    }
+
+    //equivalence class testing of control number validation
+    @Test
+    public void test_validateDate_incorrectControlNumber() {
+        IdNrValidator v = new PNrValidator(TEST_DATE);
+        assertFalse(v.isValid("19900118-9812"));
+    }
+
+    // test validation of all provided examples
     @ParameterizedTest
     @MethodSource("providedPersonalNumbers")
     public void test_isValid_providedPNr(String input, boolean expected) {
-        IdNrValidator v = new PNrValidator(LocalDate.now());
+        IdNrValidator v = new PNrValidator(TEST_DATE);
         assertEquals(expected, v.isValid(input));
     }
 
@@ -38,9 +113,25 @@ public class IdNrValidatorTest {
         );
     }
 
+
     @Test
     public void test_isValid_providedSNr() {
-        IdNrValidator v = new SamNrValidator(LocalDate.now());
+        IdNrValidator v = new SamNrValidator(TEST_DATE);
         assertTrue(v.isValid("190910799824"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("providedOrganizationNumbers")
+    public void test_isValid_providedOrgNr(String input, boolean expected) {
+        IdNrValidator v = new OrgNrValidator();
+        assertEquals(expected, v.isValid(input));
+    }
+
+    private static Stream<Arguments> providedOrganizationNumbers() {
+        return Stream.of(
+                Arguments.of("556614-3185", true),
+                Arguments.of("16556601-6399", true),
+                Arguments.of("262000-1111", true)
+        );
     }
 }

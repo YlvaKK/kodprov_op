@@ -1,6 +1,9 @@
-
-
 public abstract class IdNrValidator {
+
+    private static final String[] VALID_DIVIDERS = new String[]{"+", "-"};
+    private static final String DIVIDERS_REGEX = "[-+]";
+    private static final String VALID_FORMAT = "(\\d{6}|\\d{8})" + DIVIDERS_REGEX + "?\\d{4}";
+
     public IdNrValidator() {
     }
 
@@ -19,22 +22,25 @@ public abstract class IdNrValidator {
     }
 
     private boolean validateFormat(String idNumber) {
-        return idNumber.matches("(\\d{6}|\\d{8})[-+]?\\d{4}");
+        return idNumber.matches(VALID_FORMAT);
     }
 
     private String[] splitParts(String idNumber){
-        String[] parts = new String[]{"", "", ""};
+        String prefix;
+        String suffix;
+        String divider = "";
 
-        parts[2] = idNumber.substring(idNumber.length() - 4);
-        idNumber = idNumber.substring(0, idNumber.length() - 4);
-
-        if (idNumber.matches("\\d*[-+]")) {
-            parts[1] = idNumber.substring(idNumber.length() - 1);
-            idNumber = idNumber.substring(0, idNumber.length() - 1);
+        for (String option : VALID_DIVIDERS) {
+            if (idNumber.contains(option)) {
+                divider = option;
+                idNumber = idNumber.replaceAll(DIVIDERS_REGEX, "");
+                break;
+            }
         }
 
-        parts[0] = idNumber;
-        return parts;
+        suffix = idNumber.substring(idNumber.length() - 4);
+        prefix = idNumber.substring(0, idNumber.length() - 4);
+        return new String[]{prefix, divider, suffix};
     }
 
     private boolean validateControl(String prefix, String suffix) {
@@ -42,19 +48,20 @@ public abstract class IdNrValidator {
         int controlNumber = Character.getNumericValue(suffix.charAt(suffix.length() - 1));
         int sum = 0;
 
+        //step one
         for (int i = 0; i < number.length(); i++) {
             int product = Character.getNumericValue(number.charAt(i));
 
-            if (i % 2 == 0) {
-                product = product * 2;
-            }
+            if (i % 2 == 0) { product = product * 2; }
 
             int digitSum = (product / 10) + (product % 10);
             sum += digitSum;
         }
-        int stepTwo = (10 - sum % 10) % 10;
 
-        return stepTwo == controlNumber;
+        //step two
+        int singleDigitResult = (10 - sum % 10) % 10;
+
+        return singleDigitResult == controlNumber;
     }
 
     private String stripCentury(String prefix) {
