@@ -7,6 +7,8 @@ public abstract class IdNrValidator {
     public IdNrValidator() {
     }
 
+    //TODO: check spec one last time
+
     public boolean isValid(String idNumber) {
         if (validateFormat(idNumber)) {
             String[] parts = splitParts(idNumber);
@@ -25,6 +27,7 @@ public abstract class IdNrValidator {
         return idNumber.matches(VALID_FORMAT);
     }
 
+    //TODO: consider changing this return type (CLASS?)
     private String[] splitParts(String idNumber){
         String prefix;
         String suffix;
@@ -34,15 +37,15 @@ public abstract class IdNrValidator {
             if (idNumber.contains(option)) {
                 divider = option;
                 idNumber = idNumber.replaceAll(DIVIDERS_REGEX, "");
-                break;
             }
         }
 
-        suffix = idNumber.substring(idNumber.length() - 4);
         prefix = idNumber.substring(0, idNumber.length() - 4);
+        suffix = idNumber.substring(idNumber.length() - 4);
         return new String[]{prefix, divider, suffix};
     }
 
+    //TODO: divide (and conquer!!!!!!!!)
     private boolean validateControl(String prefix, String suffix) {
         String number = stripCentury(prefix) + suffix.substring(0, suffix.length() - 1);
         int controlNumber = Character.getNumericValue(suffix.charAt(suffix.length() - 1));

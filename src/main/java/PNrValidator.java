@@ -24,8 +24,9 @@ public class PNrValidator extends IdNrValidator{
 
     protected boolean validateSixDigitDate(int year, int month, int day, String divider) {
         int century = currentDate.getYear() / 100 * 100;
-        if (isAfterDate(century + year, month, day, currentDate)) { century -= 100; }
-        if (divider.equals("+")){ century -= 100;}
+        if (isAfterDate(century + year, month, day, currentDate) || divider.equals("+")) {
+            century -= 100;
+        }
 
         return validateDate(century + year, month, day);
     }
@@ -35,7 +36,7 @@ public class PNrValidator extends IdNrValidator{
             return false;
         }
         if (divider.equals("+") && isAfterDate(year, month, day, currentDate.minusYears(100))) {
-                return false;
+            return false;
         }
         return validateDate(year, month, day);
     }
