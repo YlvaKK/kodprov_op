@@ -12,7 +12,7 @@ public abstract class IdNrValidator {
             String suffix = parts[2];
 
             if (validatePrefix(prefix, divider)) {
-                return true;
+                return validateControl(prefix, suffix);
             }
         }
         return false;
@@ -37,8 +37,6 @@ public abstract class IdNrValidator {
         return parts;
     }
 
-    //private boolean validatePrefix(String prefix, String divider) { return false; }
-
     private boolean validateControl(String prefix, String suffix) {
         String number = stripCentury(prefix) + suffix.substring(0, suffix.length() - 1);
         int controlNumber = Character.getNumericValue(suffix.charAt(suffix.length() - 1));
@@ -59,7 +57,7 @@ public abstract class IdNrValidator {
         return stepTwo == controlNumber;
     }
 
-    protected String stripCentury(String prefix) {
+    private String stripCentury(String prefix) {
         if (prefix.length() == 8) {
             prefix = prefix.substring(2);
         }

@@ -22,7 +22,7 @@ public class PNrValidator extends IdNrValidator{
         }
     }
 
-    private boolean validateSixDigitDate(int year, int month, int day, String divider) {
+    protected boolean validateSixDigitDate(int year, int month, int day, String divider) {
         int century = currentDate.getYear() / 100 * 100;
         if (isAfterDate(century + year, month, day, currentDate)) { century -= 100; }
         if (divider.equals("+")){ century -= 100;}
@@ -30,7 +30,7 @@ public class PNrValidator extends IdNrValidator{
         return validateDate(century + year, month, day);
     }
 
-    private boolean validateEightDigitDate(int year, int month, int day, String divider) {
+    protected boolean validateEightDigitDate(int year, int month, int day, String divider) {
         if (isAfterDate(year, month, day, currentDate)) {
             return false;
         }
