@@ -103,6 +103,19 @@ public class IdNrValidatorTest {
         assertTrue(vS.isValid(number));
     }
 
+    //testing orgNrs
+    @Test
+    public void test_validateOrgNrCentury() {
+        IdNrValidator v = new OrgNrValidator();
+        assertFalse(v.isValid("17556614-3185"));
+    }
+
+    @Test
+    public void test_validateOrgNrMiddle() {
+        IdNrValidator v = new OrgNrValidator();
+        assertFalse(v.isValid("551614-3185"));
+    }
+
     // test validation of all provided examples
     @ParameterizedTest
     @MethodSource("providedPersonalNumbers")

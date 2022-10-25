@@ -1,5 +1,6 @@
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.logging.Level;
 
 public class PNrValidator extends IdNrValidator{
 
@@ -33,9 +34,11 @@ public class PNrValidator extends IdNrValidator{
 
     protected boolean validateEightDigitDate(int year, int month, int day, String divider) {
         if (isAfterDate(year, month, day, currentDate)) {
+            logger.log(Level.INFO, String.format("(2) Invalid date: %d-%d-%d is after current date", year, month, day));
             return false;
         }
         if (divider.equals("+") && isAfterDate(year, month, day, currentDate.minusYears(100))) {
+            logger.log(Level.INFO, String.format("(3) Invalid date: divider is '+', and %d-%d-%d is less than 100 years before current date", year, month, day));
             return false;
         }
         return validateDate(year, month, day);
@@ -46,6 +49,7 @@ public class PNrValidator extends IdNrValidator{
             LocalDate.of(year, month, day);
             return true;
         } catch (DateTimeException e) {
+            logger.log(Level.INFO, String.format("(4) Invalid date: %d-%d-%d does not exist", year, month, day));
             return false;
         }
     }
